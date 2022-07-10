@@ -63,6 +63,6 @@ type Client struct {
 	Name         string
 	Address      string
 	Email        string `gorm:"unique"`
-	ClientStatus string
+	ClientStatus string `json:"-"`
 	BusinessType string
 }

@@ -10,4 +10,7 @@ func Setup(app *fiber.App) {
 	app.Post("/api/create-role", controllers.CreateRole)
 	app.Post("/api/assigned-role-permissions", controllers.AssignRolePermission)
 	app.Get("/api/role/:roleId", controllers.RoleAndPermissions)
+	app.Post("api/register-user", controllers.RegisterUser)
+	app.Post("api/login", controllers.Login)
+	app.Post("api/logout", controllers.Logout)
 }
