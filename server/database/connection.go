@@ -1,6 +1,8 @@
 package database
 
 import (
+	"fmt"
+
 	"github.com/pegdwende/VSM.git/env"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -12,6 +14,7 @@ var databaseConnectionEstablished = false
 
 func Connect() {
 
+	fmt.Printf("database %s", env.GetRequiredEnvVariable("VSM_DB_PASSWORD"))
 	dns := Dns{
 		username: env.GetRequiredEnvVariable("VSM_DB_USERNAME"),
 		password: env.GetRequiredEnvVariable("VSM_DB_PASSWORD"),
