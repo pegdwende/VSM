@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -14,6 +15,12 @@ import (
 
 // test loging , protected vs unprotected routes.
 
+func test(c *fiber.Ctx) error {
+	fmt.Println("middleware works here man")
+
+	return c.Next()
+}
+
 func main() {
 
 	db := database.GetConnection()
@@ -23,6 +30,12 @@ func main() {
 	app := fiber.New(fiber.Config{
 		EnablePrintRoutes: true,
 	})
+
+	app.Get("/healthcheck", test, func(c *fiber.Ctx) error {
+		return c.SendString("OK")
+	})
+
+	AuthRoutes.SetupPublicRoutes(app)
 
 	app.Use(cors.New(cors.Config{
 		AllowCredentials: true,
@@ -34,11 +47,9 @@ func main() {
 		TokenLookup: "cookie:jwt",
 	}))
 
-	AuthRoutes.Setup(app)
+	// app.Group()
 
-	app.Get("/healthcheck", func(c *fiber.Ctx) error {
-		return c.SendString("OK")
-	})
+	AuthRoutes.Setup(app)
 
 	log.Fatal(app.Listen(":4000"))
 }

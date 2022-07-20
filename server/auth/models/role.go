@@ -1,10 +1,18 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"github.com/pegdwende/VSM.git/database"
+	"gorm.io/gorm"
+)
 
 type Role struct {
 	gorm.Model
 	RoleDescription string
-	ClientCode      string
+	ClientID        uint
+	Client          Client
 	Permissions     []Permission
+}
+
+func (role *Role) create() {
+	database.GetConnection().Create(&role)
 }

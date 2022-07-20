@@ -1,6 +1,8 @@
 package authentication
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/pegdwende/VSM.git/auth/models"
@@ -57,7 +59,8 @@ func New(config Config) fiber.Handler {
 		}
 
 		claims := token.Claims.(*jwt.StandardClaims)
-
+		fmt.Println("made it here")
+		fmt.Println(claims.Issuer)
 		var user models.User
 
 		database.GetConnection().Where("id = ?", claims.Issuer).First(&user)

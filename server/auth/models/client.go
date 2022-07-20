@@ -1,8 +1,8 @@
 package models
 
 import (
-	//"database/sql/driver"
-
+	// "github.com/pegdwende/VSM.git/database"
+	"github.com/pegdwende/VSM.git/database"
 	"gorm.io/gorm"
 )
 
@@ -59,10 +59,23 @@ const (
 
 type Client struct {
 	gorm.Model
-	Code         string `gorm:"primaryKey"`
+	ClientCode   string
 	Name         string
 	Address      string
 	Email        string `gorm:"unique"`
 	ClientStatus string `json:"-"`
 	BusinessType string
+}
+
+func (client *Client) Create() {
+
+	database.GetConnection().Create(&client)
+
+	defaultRole := Role{
+		ClientID:        client.ID,
+		RoleDescription: "Default Role",
+	}
+
+	defaultRole.create()
+
 }

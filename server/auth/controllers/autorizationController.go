@@ -17,9 +17,10 @@ func CreateRole(c *fiber.Ctx) error {
 		return err
 	}
 
+	clientId, _ := strconv.Atoi(data["client_id"])
 	role := AuthModels.Role{
 		RoleDescription: data["role_description"],
-		ClientCode:      data["client_code"],
+		ClientID:        uint(clientId),
 	}
 
 	database.GetConnection().Create(&role)
@@ -42,10 +43,11 @@ func AssignRolePermission(c *fiber.Ctx) error {
 		return c.SendString("Invalid role id provided")
 	}
 
+	clientId, _ := strconv.Atoi(data["client_id"])
 	role := AuthModels.Permission{
-		ClientCode:            data["client_code"],
+		ClientID:              uint(clientId),
 		PermissionKey:         data["permission_key"],
-		RoleId:                uint(roleId),
+		RoleID:                uint(roleId),
 		PermissionDescription: data["permission_desc"],
 	}
 

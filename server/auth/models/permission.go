@@ -10,6 +10,6 @@ type Permission struct {
 	gorm.Model
 	PermissionKey         string
 	PermissionDescription string
-	ClientCode            string
-	RoleId                uint
+	ClientID              uint
+	RoleID                uint
 }

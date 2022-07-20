@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
@@ -26,12 +27,32 @@ func RegisterUser(c *fiber.Ctx) error {
 	adminUser, _ := strconv.ParseBool(data["admin_user"])
 
 	roleId, _ := strconv.Atoi(data["role_id"])
+	clientId, _ := strconv.Atoi(data["client_id"])
+
+	var existingUserModel models.User
+
+	database.GetConnection().Where("user_name = ?", data["username"]).First(&existingUserModel)
+
+	if existingUserModel.ID != 0 {
+		fmt.Println(existingUserModel)
+		return c.JSON(fiber.Map{"message": "user already exist."})
+	}
+
+	fmt.Println("made it here")
+
+	var role models.Role
+
+	database.GetConnection().Where("id=?", roleId).First(&role)
+
+	if role.ID == 0 {
+		return c.JSON(fiber.Map{"message": "Provided role does not exist."})
+	}
 
 	user := models.User{
 		UserName:   data["username"],
 		Email:      data["email"],
 		Phone:      data["phone_number"],
-		ClientCode: data["client_code"],
+		ClientID:   uint(clientId),
 		RoleId:     uint(roleId),
 		AdminUser:  adminUser,
 		Password:   string(password),
@@ -53,9 +74,9 @@ func Login(c *fiber.Ctx) error {
 
 	var user models.User
 
-	database.GetConnection().Where("user_name = ? AND client_code = ? ", data["user_name"], data["client_code"]).First(&user)
+	database.GetConnection().Where("user_name = ?", data["user_name"]).Preload("Client", "client_code =? client_code", data["client_code"]).First(&user)
 
-	if user.ID == 0 {
+	if user.ID == 0 || user.Client.ID == 0 {
 		c.Status(fiber.StatusNotFound)
 		c.JSON(fiber.Map{"message": "user not found"})
 	}
@@ -66,11 +87,11 @@ func Login(c *fiber.Ctx) error {
 	}
 
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_nane":   user.UserName,
-		"admin":       user.AdminUser,
-		"role_id":     user.RoleId,
-		"client_code": user.ClientCode,
-		"exp":         time.Now().Add(time.Hour * 24).Unix(),
+		"user_nane": user.UserName,
+		"admin":     user.AdminUser,
+		"role_id":   user.RoleId,
+		"client_id": user.ClientID,
+		"exp":       time.Now().Add(time.Hour * 24).Unix(),
 	})
 
 	token, err := claims.SignedString([]byte(env.GetRequiredEnvVariable("JWT_SECRET")))

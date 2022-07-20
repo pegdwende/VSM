@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/pegdwende/VSM.git/auth/models"
 	AuthModels "github.com/pegdwende/VSM.git/auth/models"
 	database "github.com/pegdwende/VSM.git/database"
 )
@@ -14,8 +15,16 @@ func RegisterClient(c *fiber.Ctx) error {
 		return err
 	}
 
+	var existingClient models.Client
+
+	database.GetConnection().Where("client_id = ?", data["code"]).First(&existingClient)
+
+	if existingClient.ID != 0 {
+		return c.JSON(fiber.Map{"message": "client code exist"})
+	}
+
 	client := AuthModels.Client{
-		Code:         data["code"],
+		ClientCode:   data["code"],
 		Name:         data["name"],
 		Address:      data["address"],
 		Email:        data["email"],
@@ -23,7 +32,7 @@ func RegisterClient(c *fiber.Ctx) error {
 		BusinessType: AuthModels.RETAIL,
 	}
 
-	database.GetConnection().Create(&client)
+	client.Create()
 
 	return c.JSON(client)
 
