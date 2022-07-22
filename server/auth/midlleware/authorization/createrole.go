@@ -7,7 +7,6 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/pegdwende/VSM.git/auth/models"
 	"github.com/pegdwende/VSM.git/database"
-	"gorm.io/gorm/clause"
 )
 
 func CreateRole(c *fiber.Ctx) error {
@@ -18,10 +17,22 @@ func CreateRole(c *fiber.Ctx) error {
 
 	var existingUser models.User
 
-	database.GetConnection().Where("user_name = ?", name).Preload(clause.Associations).First(&existingUser)
+	database.GetConnection().Where("user_name = ?", name).Preload("Role.Permissions").First(&existingUser)
 
-	fmt.Println(existingUser.Role)
-	fmt.Println(existingUser)
+	userRole := existingUser.Role
+
+	fmt.Println(userRole.Permissions)
+
+	rolePermissions := userRole.Permissions
+
+	for _, element := range rolePermissions {
+
+		fmt.Println(element)
+		if element.PermissionKey == models.CREATE_ROLE {
+
+			fmt.Println("user is able to create roles")
+		}
+	}
 	return c.Next()
 
 }

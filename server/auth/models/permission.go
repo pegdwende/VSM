@@ -3,7 +3,7 @@ package models
 import "gorm.io/gorm"
 
 const (
-	CREATE_USER = "create_user"
+	CREATE_ROLE = "create_role"
 )
 
 type Permission struct {
@@ -12,4 +12,5 @@ type Permission struct {
 	PermissionDescription string
 	ClientID              uint
 	RoleID                uint
+	Role                  Role
 }

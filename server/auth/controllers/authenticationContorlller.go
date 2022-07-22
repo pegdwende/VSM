@@ -22,6 +22,10 @@ func RegisterUser(c *fiber.Ctx) error {
 		return err
 	}
 
+	if len(data["password"]) < 1 || len(data["username"]) < 1 {
+		return c.JSON(fiber.Map{"message": "User and password must be provided "})
+	}
+
 	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
 
 	adminUser, _ := strconv.ParseBool(data["admin_user"])
@@ -74,7 +78,7 @@ func Login(c *fiber.Ctx) error {
 
 	var user models.User
 
-	database.GetConnection().Where("user_name = ?", data["user_name"]).Preload("Client", "client_code =? client_code", data["client_code"]).First(&user)
+	database.GetConnection().Where("user_name = ?", data["user_name"]).Preload("Client", "client_code = ?", data["client_code"]).First(&user)
 
 	if user.ID == 0 || user.Client.ID == 0 {
 		c.Status(fiber.StatusNotFound)
@@ -86,6 +90,8 @@ func Login(c *fiber.Ctx) error {
 		c.JSON(fiber.Map{"message": "User not found"})
 	}
 
+	fmt.Println(user)
+
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_nane": user.UserName,
 		"admin":     user.AdminUser,
@@ -93,6 +99,8 @@ func Login(c *fiber.Ctx) error {
 		"client_id": user.ClientID,
 		"exp":       time.Now().Add(time.Hour * 24).Unix(),
 	})
+
+	fmt.Println(claims)
 
 	token, err := claims.SignedString([]byte(env.GetRequiredEnvVariable("JWT_SECRET")))
 

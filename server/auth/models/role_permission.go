@@ -1,8 +1,8 @@
 package models
 
-type RolePermission struct {
-	Id            uint
-	ClientCode    string
-	PermissionKey string
-	RoleId        uint
-}
+// type RolePermission struct {
+// 	Id            uint
+// 	ClientCode    string
+// 	PermissionKey string
+// 	RoleId        uint
+// }

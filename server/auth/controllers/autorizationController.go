@@ -44,16 +44,16 @@ func AssignRolePermission(c *fiber.Ctx) error {
 	}
 
 	clientId, _ := strconv.Atoi(data["client_id"])
-	role := AuthModels.Permission{
+	permissions := AuthModels.Permission{
 		ClientID:              uint(clientId),
 		PermissionKey:         data["permission_key"],
 		RoleID:                uint(roleId),
 		PermissionDescription: data["permission_desc"],
 	}
 
-	database.GetConnection().Create(&role)
+	database.GetConnection().Create(&permissions)
 
-	return c.JSON(role)
+	return c.JSON(permissions)
 }
 
 func RoleAndPermissions(c *fiber.Ctx) error {
@@ -70,5 +70,5 @@ func RoleAndPermissions(c *fiber.Ctx) error {
 
 	database.GetConnection().Preload(clause.Associations).First(&role, roleId)
 
-	return c.JSON(role.Permissions)
+	return c.JSON(role)
 }
