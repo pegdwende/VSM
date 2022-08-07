@@ -15,3 +15,5 @@
 # vendor/
 # files
 .env
+
+.idea

@@ -1,68 +1,66 @@
 package autorization
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/pegdwende/VSM.git/auth/models"
-	database "github.com/pegdwende/VSM.git/database"
+	"github.com/pegdwende/VSM.git/database"
 )
 
-type Config struct {
-	Filter       func(c *fiber.Ctx) bool
-	Unauthorized fiber.Handler
-	Authorized   func(c *fiber.Ctx)
-}
+func CreateRole(c *fiber.Ctx) error {
 
-var ConfigDefault = Config{
-	Filter:       nil,
-	Unauthorized: nil,
-	Authorized:   nil,
-}
+	user := c.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	name := claims["user_nane"].(string)
 
-func configDefault(config ...Config) Config {
+	var existingUser models.User
 
-	if len(config) < 1 {
-		return ConfigDefault
-	}
-	cfg := config[0]
+	database.GetConnection().Where("user_name = ?", name).Preload("Role.Permissions").First(&existingUser)
 
-	if cfg.Filter != nil {
-		cfg.Filter = ConfigDefault.Filter
-	}
+	userRole := existingUser.Role
 
-	if cfg.Unauthorized == nil {
-		cfg.Unauthorized = func(c *fiber.Ctx) error {
-			return c.SendStatus(fiber.StatusUnauthorized)
-		}
-	}
+	fmt.Println(userRole.Permissions)
 
-	return cfg
-}
+	rolePermissions := userRole.Permissions
 
-func New(config Config) fiber.Handler {
+	for _, element := range rolePermissions {
 
-	cfg := configDefault(config)
+		fmt.Println(element)
+		if element.PermissionKey == models.CREATE_ROLE {
 
-	return func(c *fiber.Ctx) error {
-
-		user := c.Locals("user")
-		userInfo, ok := user.(*models.User)
-
-		if !ok {
-			cfg.Unauthorized(c)
-		}
-		var userModel models.User
-
-		database.GetConnection().First(&userModel, "UserName = ?", userInfo.UserName)
-
-		if userModel.ID != 0 {
+			fmt.Println("user is able to create roles")
 			return c.Next()
 		}
-
-		if config.Filter != nil && config.Filter(c) {
-
-			return c.Next()
-		}
-
-		return cfg.Unauthorized(c)
 	}
+	return c.SendStatus(fiber.StatusUnauthorized)
+
+}
+
+func CreateUser(c *fiber.Ctx) error {
+
+	user := c.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	name := claims["user_nane"].(string)
+
+	var existingUser models.User
+
+	database.GetConnection().Where("user_name = ?", name).Preload("Role.Permissions").First(&existingUser)
+
+	userRole := existingUser.Role
+
+	fmt.Println(userRole.Permissions)
+
+	rolePermissions := userRole.Permissions
+
+	for _, element := range rolePermissions {
+
+		fmt.Println(element)
+		if element.PermissionKey == models.CREATE_ROLE {
+
+			c.Next()
+		}
+	}
+	return c.SendStatus(fiber.StatusUnauthorized)
 }

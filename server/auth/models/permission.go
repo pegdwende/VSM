@@ -4,6 +4,7 @@ import "gorm.io/gorm"
 
 const (
 	CREATE_ROLE = "create_role"
+	CREATE_USER = "create_user"
 )
 
 type Permission struct {
