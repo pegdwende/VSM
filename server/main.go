@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	jwtware "github.com/gofiber/jwt/v3"
+	InventoryModels "github.com/pegdwende/VSM.git/Inventory/models"
 	AuthModels "github.com/pegdwende/VSM.git/auth/models"
 	AuthRoutes "github.com/pegdwende/VSM.git/auth/routes"
 	database "github.com/pegdwende/VSM.git/database"
@@ -26,6 +27,7 @@ func main() {
 	db := database.GetConnection()
 
 	db.AutoMigrate(AuthModels.AuthModels...)
+	db.AutoMigrate(InventoryModels.InventoryModels...)
 
 	app := fiber.New(fiber.Config{
 		EnablePrintRoutes: true,

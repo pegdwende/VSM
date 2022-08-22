@@ -11,9 +11,16 @@ import (
 
 func CreateRole(c *fiber.Ctx) error {
 
+	fmt.Println("user from local storage")
+	fmt.Println(c.Locals("user"))
+
 	user := c.Locals("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)
 	name := claims["user_nane"].(string)
+
+	c.Locals("user_identity", claims)
+
+	// test := c.Locals("user_identity")
 
 	var existingUser models.User
 
@@ -24,6 +31,9 @@ func CreateRole(c *fiber.Ctx) error {
 	fmt.Println(userRole.Permissions)
 
 	rolePermissions := userRole.Permissions
+
+	fmt.Println(rolePermissions)
+	fmt.Println(claims)
 
 	for _, element := range rolePermissions {
 
@@ -56,7 +66,6 @@ func CreateUser(c *fiber.Ctx) error {
 
 	for _, element := range rolePermissions {
 
-		fmt.Println(element)
 		if element.PermissionKey == models.CREATE_ROLE {
 
 			c.Next()

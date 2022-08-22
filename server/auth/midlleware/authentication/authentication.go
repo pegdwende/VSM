@@ -59,13 +59,13 @@ func New(config Config) fiber.Handler {
 		}
 
 		claims := token.Claims.(*jwt.StandardClaims)
-		fmt.Println("made it here")
-		fmt.Println(claims.Issuer)
 		var user models.User
 
 		database.GetConnection().Where("id = ?", claims.Issuer).First(&user)
-
+		fmt.Println("before authenticating user")
 		if user.ID != 0 {
+			fmt.Println("test printing user from authentication")
+			fmt.Println(user)
 
 			c.Locals("user", user)
 			return c.Next()
