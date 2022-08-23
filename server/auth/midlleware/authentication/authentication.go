@@ -1,8 +1,6 @@
 package authentication
 
 import (
-	"fmt"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/pegdwende/VSM.git/auth/models"
@@ -62,10 +60,7 @@ func New(config Config) fiber.Handler {
 		var user models.User
 
 		database.GetConnection().Where("id = ?", claims.Issuer).First(&user)
-		fmt.Println("before authenticating user")
 		if user.ID != 0 {
-			fmt.Println("test printing user from authentication")
-			fmt.Println(user)
 
 			c.Locals("user", user)
 			return c.Next()

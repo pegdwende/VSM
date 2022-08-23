@@ -20,3 +20,7 @@ type Product struct {
 func (Product *Product) Create() {
 	database.GetConnection().Create(&Product)
 }
+
+func (Product *Product) Update() {
+	database.GetConnection().Save(&Product)
+}
