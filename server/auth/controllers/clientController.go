@@ -17,7 +17,7 @@ func RegisterClient(c *fiber.Ctx) error {
 
 	var existingClient models.Client
 
-	database.GetConnection().Where("client_id = ?", data["code"]).First(&existingClient)
+	database.GetConnection().Where("client_code = ?", data["code"]).First(&existingClient)
 
 	if existingClient.ID != 0 {
 		return c.JSON(fiber.Map{"message": "client code exist"})

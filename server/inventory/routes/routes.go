@@ -9,6 +9,7 @@ import (
 func Setup(app *fiber.App) {
 	app.Post("/api/create-product", InventoryControllers.CreateProduct)
 	app.Post("/api/update-product/:product_id", InventoryControllers.UpdateProduct)
+	app.Post("/api/create-order", InventoryControllers.CreateOders)
 }
 
 func SetUpPublicRoutes(app *fiber.App) {

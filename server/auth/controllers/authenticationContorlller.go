@@ -42,8 +42,6 @@ func RegisterUser(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"message": "user already exist."})
 	}
 
-	fmt.Println("made it here")
-
 	var role models.Role
 
 	database.GetConnection().Where("id=?", roleId).First(&role)
@@ -93,10 +91,11 @@ func Login(c *fiber.Ctx) error {
 	fmt.Println(user)
 
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_nane": user.UserName,
+		"user_name": user.UserName,
 		"admin":     user.AdminUser,
 		"role_id":   user.RoleId,
 		"client_id": user.ClientID,
+		"user_id":   user.ID,
 		"exp":       time.Now().Add(time.Hour * 24).Unix(),
 	})
 

@@ -6,6 +6,12 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	PENDING_ORDER   int32 = 1
+	COMPLETED_ORDER int32 = 2
+	CANCELLED_ORDER int32 = 3
+)
+
 type Product struct {
 	gorm.Model
 	ProductName        string
@@ -23,4 +29,8 @@ func (Product *Product) Create() {
 
 func (Product *Product) Update() {
 	database.GetConnection().Save(&Product)
+}
+
+func (Product *Product) Delete() {
+	database.GetConnection().Delete(&Product)
 }

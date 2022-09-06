@@ -10,11 +10,11 @@ type Order struct {
 	gorm.Model
 	UserID   uint
 	User     AuthModels.User
-	status   string
-	ClientId uint
+	Status   int32
+	ClientID uint
 	Client   AuthModels.Client
 }
 
-func (Order *Order) create() {
+func (Order *Order) Create() {
 	database.GetConnection().Create(&Order)
 }

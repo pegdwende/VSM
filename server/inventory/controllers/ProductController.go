@@ -120,3 +120,58 @@ func UpdateProduct(c *fiber.Ctx) error {
 	return c.JSON(existingProduct)
 
 }
+
+func getProductById(c *fiber.Ctx) error {
+	user := AuthServices.GetUserFromContext(c)
+
+	var existingProduct models.Product
+
+	clientId := int(user["client_id"].(float64))
+
+	product_id := c.Params("product_id", "0")
+
+	database.GetConnection().Joins("JOIN clients on products.client_id = clients.id").
+		Where("clients.id=?", clientId).
+		Where("products.id=?", product_id).First(&existingProduct)
+
+	if existingProduct.ID == 0 {
+		return c.JSON(fiber.Map{"message": "Product does does not exist for this client"})
+	}
+
+	return c.JSON(existingProduct)
+}
+
+func getAllProducts(c *fiber.Ctx) error {
+	user := AuthServices.GetUserFromContext(c)
+
+	existingProducts := []models.Product{}
+
+	clientId := int(user["client_id"].(float64))
+
+	database.GetConnection().Joins("JOIN clients on products.client_id = clients.id").
+		Where("clients.id=?", clientId).Find(&existingProducts)
+
+	return c.JSON(existingProducts)
+}
+
+func delteProduct(c *fiber.Ctx) error {
+	user := AuthServices.GetUserFromContext(c)
+
+	var existingProduct models.Product
+
+	clientId := int(user["client_id"].(float64))
+
+	product_id := c.Params("product_id", "0")
+
+	database.GetConnection().Joins("JOIN clients on products.client_id = clients.id").
+		Where("clients.id=?", clientId).
+		Where("products.id=?", product_id).First(&existingProduct)
+
+	if existingProduct.ID == 0 {
+		return c.JSON(fiber.Map{"message": "Could specified product"})
+	}
+
+	existingProduct.Delete()
+
+	return c.JSON(fiber.Map{"message": "Product succeffuly deleted", "product_id": product_id})
+}

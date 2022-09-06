@@ -17,6 +17,6 @@ type OrderItems struct {
 	Client    AuthModels.Client
 }
 
-func (OrderItems *OrderItems) create() {
+func (OrderItems *OrderItems) Create() {
 	database.GetConnection().Create(&OrderItems)
 }
